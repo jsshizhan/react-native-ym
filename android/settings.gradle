@@ -1,0 +1,3 @@
+rootProject.name = 'reactNativeOwn'
+
+include ':app', ':react-native-leancloud-ym'
