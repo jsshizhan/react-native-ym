@@ -1,12 +1,12 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion "26.0.1"
+    compileSdkVersion 23
+    buildToolsVersion "22.0.1"
 
     defaultConfig {
-        minSdkVersion 16
-        targetSdkVersion 23
+        minSdkVersion 8
+        targetSdkVersion 8
         versionCode 1
         versionName "1.0"
 
@@ -23,13 +23,11 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile "com.facebook.react:react-native:+"
-    compile 'com.android.support:appcompat-v7:26.0.0-alpha1'
-    compile 'com.liangmayong:text2speech:1.0.1'
+    compile 'com.facebook.react:react-native:+'
     compile ('com.android.support:support-v4:21.0.3')
-    // LeanCloud 基础包
-    compile ('cn.leancloud.android:avoscloud-sdk:v4.4.4')
-    // 推送与实时聊天需要的包
-    compile ('cn.leancloud.android:avoscloud-push:v4.4.4@aar'){transitive = true}
+    //必选
+    compile 'com.alibaba.mobileim:IMCore:2.0.2.1@aar'
+    //可选，如果使用SDK的UI必须添加该依赖，如果不使用SDK的UI，完全自己开发UI则无需添加该依赖
+    compile 'com.alibaba.mobileim:IMKit:2.0.2.1@aar'
     testCompile 'junit:junit:4.12'
 }

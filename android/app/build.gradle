@@ -40,7 +40,6 @@ import com.android.build.OutputFile
  *   //         'devDisabledIn${productFlavor}${buildType}'
  *   //         'devDisabledIn${buildType}'
  *
- *   // the root of your project, i.e. where "package.json" lives
  *   root: "../../",
  *
  *   // where to put the JS bundle asset in debug mode
@@ -94,8 +93,8 @@ def enableSeparateBuildPerCPUArchitecture = false
 def enableProguardInReleaseBuilds = false
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion '26.0.1'
+    compileSdkVersion 'Google Inc.:Google APIs:24'
+    buildToolsVersion '23.0.2'
 
     defaultConfig {
         applicationId "com.reactnativeown"
