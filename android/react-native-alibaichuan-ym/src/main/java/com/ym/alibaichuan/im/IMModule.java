@@ -1,6 +1,7 @@
 package com.ym.alibaichuan.im;
 
 import android.app.Activity;
+import android.app.Application;
 import android.content.Intent;
 import android.text.TextUtils;
 
@@ -8,11 +9,15 @@ import com.alibaba.mobileim.IYWLoginService;
 import com.alibaba.mobileim.YWAPI;
 import com.alibaba.mobileim.YWIMKit;
 import com.alibaba.mobileim.YWLoginParam;
+import com.alibaba.mobileim.aop.AdviceBinder;
+import com.alibaba.mobileim.aop.PointCutEnum;
 import com.alibaba.mobileim.channel.event.IWxCallback;
 import com.alibaba.mobileim.conversation.EServiceContact;
+import com.alibaba.wxlib.util.SysUtil;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.modules.toast.ToastModule;
 
 /**
  * Created by Administrator on 2017-10-17.
@@ -26,6 +31,23 @@ public class IMModule extends ReactContextBaseJavaModule {
     @Override
     public String getName() {
         return "alibaichuanIM";
+    }
+
+    private void initIM(){
+        Application application = super.getCurrentActivity().getApplication();
+        //必须首先执行这部分代码, 如果在":TCMSSevice"进程中，无需进行云旺（OpenIM）和app业务的初始化，以节省内存;
+        SysUtil.setApplication(application);
+        if (SysUtil.isTCMSServiceProcess(application)) {
+            return;
+        }
+        //第一个参数是Application Context
+        //这里的APP_KEY即应用创建时申请的APP_KEY，同时初始化必须是在主进程中
+        if (SysUtil.isMainProcess()) {
+
+            YWAPI.init(application, IMTool.IM_KEY);
+        }
+        //会话列表UI相关
+        AdviceBinder.bindAdvice(PointCutEnum.CONVERSATION_FRAGMENT_UI_POINTCUT, TabMessageView.class);
     }
 
     @ReactMethod
@@ -49,6 +71,7 @@ public class IMModule extends ReactContextBaseJavaModule {
             @Override
             public void onError(int errCode, String description) {
                 //如果登录失败，errCode为错误码,description是错误的具体描述信息
+
             }
         });
     }
@@ -68,6 +91,7 @@ public class IMModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void initIMKit(String accountName){
+        initIM();
         IMTool.getInstance().initIMKit(accountName, IMTool.IM_KEY);
     }
 
