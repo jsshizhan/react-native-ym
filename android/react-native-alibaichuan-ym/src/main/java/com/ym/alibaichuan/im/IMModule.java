@@ -28,13 +28,19 @@ public class IMModule extends ReactContextBaseJavaModule {
         super(reactContext);
     }
 
+    private String key;
+
+    private String password;
+
     @Override
     public String getName() {
         return "alibaichuanIM";
     }
 
-    private void initIM(){
+    private void initIM(String key,String password){
         Application application = super.getCurrentActivity().getApplication();
+        this.key = key;
+        this.password = password;
         //必须首先执行这部分代码, 如果在":TCMSSevice"进程中，无需进行云旺（OpenIM）和app业务的初始化，以节省内存;
         SysUtil.setApplication(application);
         if (SysUtil.isTCMSServiceProcess(application)) {
@@ -44,7 +50,7 @@ public class IMModule extends ReactContextBaseJavaModule {
         //这里的APP_KEY即应用创建时申请的APP_KEY，同时初始化必须是在主进程中
         if (SysUtil.isMainProcess()) {
 
-            YWAPI.init(application, IMTool.IM_KEY);
+            YWAPI.init(application, this.key);
         }
         //会话列表UI相关
         AdviceBinder.bindAdvice(PointCutEnum.CONVERSATION_FRAGMENT_UI_POINTCUT, TabMessageView.class);
@@ -52,9 +58,9 @@ public class IMModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void toChatCustomer(String accountName){
-        final YWIMKit mIMKit = YWAPI.getIMKitInstance(accountName, IMTool.IM_KEY);
+        final YWIMKit mIMKit = YWAPI.getIMKitInstance(accountName, this.key);
         IYWLoginService loginService = mIMKit.getLoginService();
-        YWLoginParam loginParam = YWLoginParam.createLoginParam(accountName, IMTool.IM_PASSWORD);
+        YWLoginParam loginParam = YWLoginParam.createLoginParam(accountName, this.password);
         loginService.login(loginParam, new IWxCallback() {
             @Override
             public void onSuccess(Object... arg0) {
@@ -85,14 +91,14 @@ public class IMModule extends ReactContextBaseJavaModule {
         if (TextUtils.isEmpty(loginUserId) || TextUtils.isEmpty(appKey)) {
             return;
         }
-        Intent intent = mIMKit.getChattingActivityIntent(id, IMTool.IM_KEY);
+        Intent intent = mIMKit.getChattingActivityIntent(id, this.key);
         context.startActivity(intent);
     }
 
     @ReactMethod
-    public void initIMKit(String accountName){
-        initIM();
-        IMTool.getInstance().initIMKit(accountName, IMTool.IM_KEY);
+    public void initIMKit(String accountName,String key,String password){
+        initIM(key,password);
+        IMTool.getInstance().initIMKit(accountName, this.key);
     }
 
     @ReactMethod

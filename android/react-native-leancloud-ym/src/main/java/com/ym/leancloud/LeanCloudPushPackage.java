@@ -17,11 +17,11 @@ public class LeanCloudPushPackage implements ReactPackage {
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
         List<NativeModule> modules = new ArrayList<>();
-        modules.add(new LeanCloudPush(reactContext));
+        modules.add(new LeanCloudPushModule(reactContext));
         return modules;
     }
 
-    @Override
+//    @Override
     public List<Class<? extends JavaScriptModule>> createJSModules() {
         return Collections.emptyList();
     }

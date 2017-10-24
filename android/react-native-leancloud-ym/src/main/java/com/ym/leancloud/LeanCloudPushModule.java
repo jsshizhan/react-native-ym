@@ -22,20 +22,17 @@ import java.util.Map;
 /**
  * Created by tshen on 16/8/16.
  */
-public class LeanCloudPush extends ReactContextBaseJavaModule {
+public class LeanCloudPushModule extends ReactContextBaseJavaModule {
 
-    public static String MODULE_NAME = "LeanCloudPush";
-
-    private static LeanCloudPush singleton;
-    private static Map<String, String> backgroundNotificationCache = null;
+    public static String MODULE_NAME = "LeanCloudPushYM";
+    private static LeanCloudPushModule singleton;
     private static String ON_RECEIVE = "leancloudPushOnReceive";
     private static String ON_ERROR = "leancloudPushOnError";
     private static String ON_PRESS = "onPress";
 
-    public LeanCloudPush(ReactApplicationContext reactContext) {
+    public LeanCloudPushModule(ReactApplicationContext reactContext) {
         super(reactContext);
         singleton = this;
-        // subscribeChannel("15950450693");
     }
 
     protected static void onError(Exception e) {
@@ -52,6 +49,7 @@ public class LeanCloudPush extends ReactContextBaseJavaModule {
         writableMap.putString("type", map.get("type"));
         writableMap.putString("title", map.get("title"));
         writableMap.putString("alert", map.get("alert"));
+        writableMap.putString("id", map.get("id"));
         return writableMap;
     }
 
@@ -64,7 +62,7 @@ public class LeanCloudPush extends ReactContextBaseJavaModule {
         }
     }
 
-    protected static void driverPush(Map<String, String> map){
+    protected static void emitJS(Map<String, String> map){
         if (singleton != null) {
             WritableMap pushNotification = getWritableMap(map);
             RCTDeviceEventEmitter emitter = singleton.getReactApplicationContext().getJSModule(RCTDeviceEventEmitter.class);
@@ -87,8 +85,15 @@ public class LeanCloudPush extends ReactContextBaseJavaModule {
         this.subscribeChannel(channel);
     }
 
+    @ReactMethod
+    public void unSubscribe(String channel){
+        PushService.unsubscribe(AVOSCloud.applicationContext,channel);
+        AVInstallation.getCurrentInstallation().saveInBackground();
+    }
+
     private void subscribeChannel(String channel) {
         PushService.subscribe(AVOSCloud.applicationContext, channel, null);
+        AVInstallation.getCurrentInstallation().saveInBackground();
     }
 
     @ReactMethod

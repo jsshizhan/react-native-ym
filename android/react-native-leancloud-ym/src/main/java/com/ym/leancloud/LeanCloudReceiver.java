@@ -9,7 +9,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.LocalBroadcastManager;
 
 import com.avos.avoscloud.AVOSCloud;
 
@@ -22,16 +21,9 @@ import java.util.Map;
 
 public class LeanCloudReceiver extends BroadcastReceiver {
 
-    private final static String ACTION = "com.inthub.chenjunwuliushipper.push";
-
-    private LocalBroadcastManager localBroadcastManager;
-
      @Override
     public void onReceive(Context context, Intent intent) {
-        if (!intent.getAction().equals(ACTION)) {
-            return;
-        }
-        
+
         try{
             JSONObject json = new JSONObject(intent.getExtras().getString("com.avos.avoscloud.Data"));
             String type = json.getString("msgType");
@@ -40,12 +32,15 @@ public class LeanCloudReceiver extends BroadcastReceiver {
             String objectId = json.getString("objectId");
             com.liangmayong.text2speech.Text2Speech.speech(context, msg, true);
             int mNotificationId = (int) (Math.random() * 10000);
-            Intent clickIntent = new Intent(AVOSCloud.applicationContext, WaybillDetailReceiver.class);
+            Intent clickIntent = new Intent(AVOSCloud.applicationContext, ReceiverOnPress.class);
             clickIntent.putExtra("id",objectId);
+            clickIntent.putExtra("type",type);
+            clickIntent.putExtra("title",title);
+            clickIntent.putExtra("alert",msg);
             PendingIntent contentIntent = PendingIntent.getBroadcast(AVOSCloud.applicationContext, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             NotificationCompat.Builder mBuilder =
                         new NotificationCompat.Builder(AVOSCloud.applicationContext)
-                                .setSmallIcon(R.mipmap.ic_launcher)
+                                .setSmallIcon(R.drawable.push_icon)
                                 .setContentTitle(msg)
                                 .setContentText(title)
                                 .setContentIntent(contentIntent)
@@ -59,14 +54,15 @@ public class LeanCloudReceiver extends BroadcastReceiver {
             map.put("type", type);
             map.put("title", title);
             map.put("alert", msg);
-            LeanCloudPush.onReceive(map);
+            map.put("id", objectId);
+            LeanCloudPushModule.onReceive(map);
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
-    public static class WaybillDetailReceiver extends BroadcastReceiver{
+    public static class ReceiverOnPress extends BroadcastReceiver{
         @Override
         public void onReceive(Context context, Intent intent) {
             Intent mainIntent;
@@ -84,7 +80,7 @@ public class LeanCloudReceiver extends BroadcastReceiver {
             map.put("id",intent.getExtras().get("id").toString());
             map.put("type",intent.getExtras().get("type").toString());
             map.put("alert",intent.getExtras().get("alert").toString());
-            LeanCloudPush.driverPush(map);
+            LeanCloudPushModule.emitJS(map);
         }
     }
 

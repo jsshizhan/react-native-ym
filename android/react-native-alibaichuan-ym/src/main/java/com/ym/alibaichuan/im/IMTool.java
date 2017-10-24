@@ -25,9 +25,6 @@ import java.util.Map;
 
 public class IMTool {
 
-    public static final String IM_KEY="23737637";
-    public static final String IM_PASSWORD="xxxxxx";
-
     private static IMTool sInstance = new IMTool();
 
     public static IMTool getInstance() {

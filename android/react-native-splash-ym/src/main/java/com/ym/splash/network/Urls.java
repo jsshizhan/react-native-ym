@@ -6,18 +6,17 @@ package com.ym.splash.network;
 
 public class Urls {
 
-    public static String URL = "http://192.168.1.167:9804";
-
     public static final String WELCOME = "/api/auth/system/welcome";
 
     public static final String FILE_SHOW = "/file/";
 
 
 
-    public static String getUrl(String... uris){
-        for(String uri:uris){
-            URL += uri;
-        }
-        return URL;
+    public static String getRequestUrl(String url,String api){
+        return url + api;
+    }
+
+    public static String getFileShow(String url,String fileName){
+        return url + FILE_SHOW + fileName;
     }
 }
